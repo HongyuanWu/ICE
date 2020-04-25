@@ -26,6 +26,7 @@ remotes::install_github("bioinformatist/ICE")
 ``` r
 library(ICE)
 data("mionco.circ")
+# Not in package up to now. Please follow section below to generate this dataset
 data("mionco.pcg")
 ```
 
@@ -47,16 +48,16 @@ data("mionco.pcg")
 #> Iteration 10
 #> Cross-validation complete
 #>             PCC      P-Value      RMSE
-#>  [1,] 0.3593281 7.884782e-04  8.729384
-#>  [2,] 0.3264386 2.441395e-03 12.647389
-#>  [3,] 0.5119432 6.444677e-07  9.898483
-#>  [4,] 0.4611714 1.010764e-05 11.491493
-#>  [5,] 0.4698115 6.523424e-06  8.570688
-#>  [6,] 0.2335763 3.248762e-02  6.581966
-#>  [7,] 0.4055682 1.295863e-04  5.622876
-#>  [8,] 0.4702542 6.376640e-06  9.019864
-#>  [9,] 0.3617744 7.213418e-04  9.110699
-#> [10,] 0.4553113 1.351237e-05  7.014257
+#>  [1,] 0.3733098 4.696102e-04 10.692914
+#>  [2,] 0.5613556 2.780094e-08  5.548638
+#>  [3,] 0.3292772 2.225004e-03  6.811714
+#>  [4,] 0.4831332 3.243019e-06 10.464265
+#>  [5,] 0.4401538 2.794478e-05  9.144700
+#>  [6,] 0.3978292 1.786365e-04  8.737620
+#>  [7,] 0.3871327 2.748662e-04  8.462851
+#>  [8,] 0.2717528 1.239881e-02  9.911899
+#>  [9,] 0.3668547 5.982701e-04 10.213629
+#> [10,] 0.4159487 8.320301e-05 10.029521
 ```
 
 ### Perform cross-validation analysis to determine the expected imputation accuracy of entire circRNA dataset
@@ -5774,7 +5775,7 @@ abline(h = -log10(0.05), lty = 3)
 ``` r
 # Find out which miRNAs were imputed with better accuracy 
 colnames(mionco.circ)[which(cv.full[,1] > 0.5)]
-#> character(0)
+#> [1] "hsa_circ_0000175" "hsa_circ_0000370" "hsa_circ_0000870"
 colnames(mionco.circ)[which(cv.full[,2] < 0.05)]
 #> character(0)
 ```
