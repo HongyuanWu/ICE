@@ -1,10 +1,10 @@
 #' @title ICE cross-validation loop function for full circRNA matrix
 #' @description Convinient wrapper for \link[ICE]{ICE_cv} that performs cross-validation analysis for
-#' assessing imputation accuracies for all miRNAs using the training datasets
+#' assessing imputation accuracies for all circRNAs using the training datasets
 #' @param train.pcg training protein coding dataset. a numeric matrix with with row names indicating
 #' samples, and column names indicating protein coding gene IDs.
-#' @param train.circ training miRNA expression dataset. a numeric matrix with row names indicating
-#' samples, and column names indicating miRNA IDs.
+#' @param train.circ training circRNA expression dataset. a numeric matrix with row names indicating
+#' samples, and column names indicating circRNA IDs.
 #' @param method method for imputation, either "RF" for random forests, "KNN" for K-nearest neighbor or
 #' "SVM" for support vector machines.
 #' @param ... optional parameters that can be passed on to the machine-learning method:

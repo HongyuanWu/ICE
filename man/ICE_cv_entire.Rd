@@ -10,8 +10,8 @@ ICE_cv_entire(train.pcg, train.circ, method = "KNN", ...)
 \item{train.pcg}{training protein coding dataset. a numeric matrix with with row names indicating
 samples, and column names indicating protein coding gene IDs.}
 
-\item{train.circ}{training miRNA expression dataset. a numeric matrix with row names indicating
-samples, and column names indicating miRNA IDs.}
+\item{train.circ}{training circRNA expression dataset. a numeric matrix with row names indicating
+samples, and column names indicating circRNA IDs.}
 
 \item{method}{method for imputation, either "RF" for random forests, "KNN" for K-nearest neighbor or
 "SVM" for support vector machines.}
@@ -25,7 +25,7 @@ of the complete miRNA training dataset
 }
 \description{
 Convinient wrapper for \link[ICE]{ICE_cv} that performs cross-validation analysis for
-assessing imputation accuracies for all miRNAs using the training datasets
+assessing imputation accuracies for all circRNAs using the training datasets
 }
 \examples{
 ICE_cv_entire(train.pcg = GA.pcg, train.circ = GA.mir, method = "KNN")
