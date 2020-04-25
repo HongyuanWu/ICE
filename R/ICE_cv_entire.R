@@ -15,7 +15,7 @@
 #' ICE_cv_entire(train.pcg = GA.pcg, train.circ = GA.mir, method = "SVM")
 #'
 #' @return a matrix containing Spearman's correlation coefficient, P-value and RMSE from the cross-validation analysis
-#' of the complete miRNA training dataset
+#' of the complete circRNA training dataset
 #' @export ICE_cv_entire
 ICE_cv_entire <- function (train.pcg, train.circ, method = "KNN", ...) {
   cv.loop <- list()

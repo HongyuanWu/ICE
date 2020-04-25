@@ -33,9 +33,9 @@
 #' @export ICE_cv
 ICE_cv <- function (train.pcg, train.circ, gene.index, num = 50, method = "KNN", folds = 10, filter = TRUE, ...) {
 
-  if (mode(gene.index)!="numeric" & mode(gene.index)!="character") stop ("Error: miRNA not found in training dataset. Please check gene name or rownumber")
-  if (mode(gene.index)=="numeric" & gene.index > ncol(train.circ))  stop ("Error: miRNA not found in training dataset. Please check ID or rownumber")
-  if (mode(gene.index)=="character" & is.na (match (gene.index, colnames(train.circ)))) stop ("Error: miRNA not found. Please check ID or rownumber")
+  if (mode(gene.index)!="numeric" & mode(gene.index)!="character") stop ("Error: circRNA not found in training dataset. Please check gene name or rownumber")
+  if (mode(gene.index)=="numeric" & gene.index > ncol(train.circ))  stop ("Error: circRNA not found in training dataset. Please check ID or rownumber")
+  if (mode(gene.index)=="character" & is.na (match (gene.index, colnames(train.circ)))) stop ("Error: circRNA not found. Please check ID or rownumber")
 
   if (filter) {
     train.pcg <- pre_process(train.pcg)

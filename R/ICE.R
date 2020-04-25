@@ -27,16 +27,16 @@ NULL
 #' @export
 #'
 #' @examples
-#' data(iMIRAGE.datasets)
-#' imirage(GA.pcg, GA.mir, HS.pcg, gene_index="hsa-let-7c", method="KNN", num=50)
-#' imirage(GA.pcg, GA.mir, HS.pcg, gene_index=25, method="KNN", num=50)
+#' data("mionco.circ")
+#' data("mionco.pcg")
+#' pred.circ <- ICE(train.pcg = mionco.pcg, train.circ = mionco.circ, new.pcg = mionco.pcg, gene.index = "hsa_circ_0000801")
 ICE <- function(train.circ, train.pcg, new.pcg, gene.index, method = "KNN", num = 50, ...) {
   if (mode(train.pcg) != "numeric" | mode(train.circ) != "numeric" | mode(new.pcg) != "numeric" |
       class(train.pcg) != "matrix" | class(train.circ) != "matrix" | class(new.pcg) != "matrix") stop ("Error: input data must be a numeric matrix")
 
 
-  if (mode(gene.index) == "numeric" & gene.index > ncol(train.circ)) stop ("Error: miRNA not found in training dataset")
-  if (mode(gene.index) == "character" & is.na (match (gene.index, colnames(train.circ)))) stop ("Error: miRNA not found")
+  if (mode(gene.index) == "numeric" & gene.index > ncol(train.circ)) stop ("Error: circRNA not found in training dataset")
+  if (mode(gene.index) == "character" & is.na (match (gene.index, colnames(train.circ)))) stop ("Error: circRNA not found")
 
   temp <- match_mat(train.pcg, new.pcg)
   train.pcg <- temp[[1]]
