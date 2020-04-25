@@ -24,6 +24,6 @@ ICE_cv_entire <- function (train.pcg, train.circ, method = "KNN", ...) {
     print(i)
   }
 
-  cv.results <- CVProc(cv.loop)
+  cv.results <- cv_proc(cv.loop)
   return(cv.results)
 }
