@@ -1,0 +1,130 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+library(knitr)
+hook_output <- knit_hooks$get("output")
+knit_hooks$set(output = function(x, options) {
+  lines <- options$output.lines
+  if (is.null(lines)) {
+    return(hook_output(x, options))  # pass to default hook
+  }
+  x <- unlist(strsplit(x, "\n"))
+  more <- "..."
+  if (length(lines)==1) {        # first n lines
+    if (length(x) > lines) {
+      # truncate the output, but add ....
+      x <- c(head(x, lines), more)
+    }
+  } else {
+    x <- c(more, x[lines], more)
+  }
+  # paste these lines together
+  x <- paste(c(x, ""), collapse = "\n")
+  hook_output(x, options)
+})
+```
+
+# ICE
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+ICE (**I**mpute **C**ircRNA **E**xpression) is designed for imputing circRNA expression using PCGs (protein-coding genes).
+
+## Installation
+
+> Currently bundled example data may be huge in size. One could try use proxy and pull it first.
+
+```r
+remotes::install_github("bioinformatist/ICE")
+```
+
+## Quick start
+
+### `library()` package and load example data
+
+```{r}
+library(ICE)
+data("mionco.circ")
+data("mionco.pcg")
+```
+
+### Perform cross-validation analysis to determine the expected accuracy of imputing a circRNA of interest using the training datasets
+
+```{r}
+(cv.circ <- ICE_cv(train.pcg = mionco.pcg, train.circ = mionco.circ, gene.index="hsa_circ_0000801"))
+```
+
+### Perform cross-validation analysis to determine the expected imputation accuracy of entire circRNA dataset
+
+```{r output.lines = 15}
+# Use a small part of example circRNA expression data
+sample.sub <- sample(rownames(mionco.pcg), size = 100)
+cv.full <- ICE_cv_entire(train.pcg = mionco.pcg[sample.sub, ], train.circ = mionco.circ[sample.sub, 1:300])
+plot(cv.full[,1], -log10(cv.full[,2]), xlab = "Spearman R", ylab = "P-value (-log10)", pch = 16, main = "Cross-validation accuracy")
+abline(h = -log10(0.05), lty = 3)
+# Find out which miRNAs were imputed with better accuracy 
+colnames(mionco.circ)[which(cv.full[,1] > 0.5)]
+colnames(mionco.circ)[which(cv.full[,2] < 0.05)]
+```
+
+### Impute expression of certain circRNA(s) of interest with new dataset
+
+> I use the same dataset as *new* dataset for a temporary show, as it will be replaced once we have another pair of data.
+
+```{r}
+(pred.circ <- ICE(train.pcg = mionco.pcg, train.circ = mionco.circ, new.pcg = mionco.pcg, gene.index = "hsa_circ_0000801"))
+plot(pred.circ, mionco.circ[, "hsa_circ_0000801"], xlab = "Predicted", ylab = "Measured", main = "hsa_circ_0000801 imputation performance", pch = 16)
+abline(lm(mionco.circ[, "hsa_circ_0000801"] ~ pred.circ), lty = 3)
+```
+
+### Impute expression of all circRNAs available in the training dataset (*To be finished*)
+
+## Example dataset (*To be finished*)
+
+To perform further analysis on circRNAs, we need to convert genome region (**Chromosome**:**Start**-**End**) to circRNA identifiers according to [circBase](http://www.circbase.org) records. Besides, genome assemblies currently used in circBase are hg19 for H. sapiens. To convert the data between assemblies, one can use liftOver tool at [UCSC's web interface](http://genome.ucsc.edu/cgi-bin/hgLiftOver).
+
+One pair of circRNA and PCGs matrices is from paper [*The Landscape of Circular RNA in Cancer*](https://www.sciencedirect.com/science/article/pii/S0092867418316350).
+
+circRNA expression matrix was downloaded from [this website](https://mioncocirc.github.io/download/), and pre-processed by below code:
+
+```r
+library(data.table)
+mionco.circ <- fread('v0.1.release.txt')
+bed <- fread('hglft_genome_5d4de_3493b0.bed')
+bed <- bed[, 1:4]
+setnames(bed, c('chr', 'start', 'end', 'ID'))
+mionco.circ <- na.omit(mionco.circ[bed, on = .(chr == chr, start > start, end < end), allow.cartesian=TRUE])
+mionco.circ <- dcast(mionco.circ, formula = sample ~ ID, value.var = 'reads', fun.aggregate = max)
+mionco.circ <- as.matrix(mionco.circ, rownames = 'sample')
+
+mionco.pcg <- fread('fpkm_matrix.csv', drop = 1)
+mionco.pcg[, Row.names := tstrsplit(Row.names, '\\.')[[1]]]
+mionco.pcg[, V2 := NULL]
+mionco.pcg <- as.matrix(mionco.pcg, rownames = 'Row.names')
+mionco.pcg <- t(mionco.pcg)
+
+sample.used <- intersect(rownames(mionco.circ), rownames(mionco.pcg))
+mionco.circ <- mionco.circ[sample.used, ]
+mionco.pcg <- mionco.pcg[sample.used, ]
+```
+
+## TODO list
+
+- [ ] Add: new test datasets (also make adjustment for gene IDs)
+- [ ] Subset: we do **NOT** need such a big training dataset
+- [ ] Refactor: rewrite cv process with `caret`?
+- [ ] Refactor: rewrite type check for satisfying the Bioc's?
+- [ ] Fix: warning `In cor(train.pcg, train.circ[, gene.index]) : the standard deviation is zero`
+- [ ] Vignette: replace plots with `ggplot2` and add other examples 
+- [ ] Application: on TCGA datasets? Artificial datasets? Others?
