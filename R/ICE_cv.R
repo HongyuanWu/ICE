@@ -42,7 +42,7 @@ ICE_cv <- function (train.pcg, train.circ, gene.index, num = 50, method = "KNN",
     train.circ <- filter_circ(train.circ)
   }
 
-  cv.res <- matrix (nrow=folds, ncol=3)
+  cv.res <- matrix(nrow=folds, ncol=3)
   colnames (cv.res) <- c("PCC", "P-Value", "RMSE")
 
   if (num >= 50 & ncol(train.pcg) >=50 ) x <- corf(train.pcg, train.circ, gene.index, num)
@@ -89,7 +89,7 @@ ICE_cv <- function (train.pcg, train.circ, gene.index, num = 50, method = "KNN",
       predict.y <- predict(imp.rf, testx)
       r.rf <- suppressWarnings(cor.test(predict.y, actual.y, method="spearman"))
       rmse.rf <- sqrt(mean((actual.y-predict.y)^2))
-      cv.res [k, 1:3] <- c(r.rf$estimate, r.rf$p.value, rmse.rf)
+      cv.res[k, 1:3] <- c(r.rf$estimate, r.rf$p.value, rmse.rf)
       next()
     }
 
@@ -98,7 +98,7 @@ ICE_cv <- function (train.pcg, train.circ, gene.index, num = 50, method = "KNN",
       knn.fit <- knn.reg(train = x, test = testx, y = y, k=50, ...)
       r.knn <- suppressWarnings(cor.test(knn.fit$pred, actual.y, method="spearman"))
       rmse.knn <- sqrt(mean((actual.y - knn.fit$pred)^2))
-      cv.res [k, 1:3] <- c(r.knn$estimate, r.knn$p.value, rmse.knn)
+      cv.res[k, 1:3] <- c(r.knn$estimate, r.knn$p.value, rmse.knn)
       next()
     }
 
@@ -108,10 +108,41 @@ ICE_cv <- function (train.pcg, train.circ, gene.index, num = 50, method = "KNN",
       predict.y <- predict(imp.svm, testx)
       r.svm <- suppressWarnings(cor.test(predict.y, actual.y, method="spearman"))
       rmse.svm <- sqrt(mean((actual.y-predict.y)^2))
-      cv.res [k, 1:3] <- c(r.svm$estimate, r.svm$p.value, rmse.svm)
+      cv.res[k, 1:3] <- c(r.svm$estimate, r.svm$p.value, rmse.svm)
       next()
     }
 
+    if (method=="lasso") {
+      cv.lasso <- cv.glmnet(x, y, alpha = 1, family = 'poisson')
+      lasso.model <- glmnet(x, y, alpha = 1, family = 'poisson')
+      predict.y <- predict.glmnet(lasso.model, s = cv.lasso$lambda.min, newx = testx)
+      r.lasso <- suppressWarnings(cor.test(predict.y, actual.y, method="spearman"))
+      rmse.lasso <- sqrt(mean((actual.y - predict.y) ^ 2))
+      cv.res[k, 1:3] <- c(r.lasso$estimate, r.lasso$p.value, rmse.lasso)
+      next()
+    }
+
+    if (method == "EN") {
+      en.model <- suppressWarnings(train(
+        x, y, method = 'glmnet',
+        trControl = trainControl("cv", number = 10),
+        tuneLength = 100))
+      predict.y <- predict(en.model, testx)
+      r.en <- suppressWarnings(cor.test(predict.y, actual.y, method="spearman"))
+      rmse.en <- sqrt(mean((actual.y - predict.y) ^ 2))
+      cv.res[k, 1:3] <- c(r.en$estimate, r.en$p.value, rmse.en)
+      next()
+    }
+
+    if (method == 'PCR') {
+      temp.df <- data.frame(x, y)
+      pcr.model <- pcr(y ~ ., data = temp.df, scale =TRUE, validation = "CV")
+      predict.y <- predict(pcr.model, x, ...)
+      r.pcr <- suppressWarnings(cor.test(predict.y, actual.y, method="spearman"))
+      rmse.pcr <- sqrt(mean((actual.y - predict.y) ^ 2))
+      cv.res[k, 1:3] <- c(rmse.pcr$estimate, rmse.pcr$p.value, rmse.pcr)
+      next()
+    }
   }
 
   cat("\nCross-validation complete\n")

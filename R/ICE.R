@@ -6,6 +6,8 @@
 #' @import randomForest
 #' @import FNN
 #' @import e1071
+#' @importFrom glmnet cv.glmnet glmnet predict.glmnet
+#' @importFrom caret train predict
 NULL
 
 #' ICE: Impute expression of a certain series of circRNAs of interest
@@ -32,7 +34,7 @@ NULL
 #' pred.circ <- ICE(train.pcg = mionco.pcg, train.circ = mionco.circ, new.pcg = mionco.pcg, gene.index = "hsa_circ_0000801")
 ICE <- function(train.circ, train.pcg, new.pcg, gene.index, method = "KNN", num = 50, ...) {
   if (mode(train.pcg) != "numeric" | mode(train.circ) != "numeric" | mode(new.pcg) != "numeric" |
-      class(train.pcg) != "matrix" | class(train.circ) != "matrix" | class(new.pcg) != "matrix") stop ("Error: input data must be a numeric matrix")
+      !is(train.pcg, "matrix") | !is(train.circ, "matrix") | !is(new.pcg, "matrix")) stop ("Error: input data must be a numeric matrix")
 
 
   if (mode(gene.index) == "numeric" & gene.index > ncol(train.circ)) stop ("Error: circRNA not found in training dataset")
@@ -51,12 +53,12 @@ ICE <- function(train.circ, train.pcg, new.pcg, gene.index, method = "KNN", num 
   if (sd(y)==0) stop ("Error: Standard deviation of circRNA is 0")
   if (nrow(train.pcg) < 50) warning("Warning: Sample size is < 50")
 
-  if (num >= 50 & ncol(train.pcg) >=50 ) x <- corf(train.pcg, train.circ, gene.index, num)
+  if (num >= 50 & ncol(train.pcg) >= 50 ) x <- corf(train.pcg, train.circ, gene.index, num)
   if (ncol(train.pcg) < 50) x <- train.pcg
 
   if (method == "RF") {
     rfit <- randomForest(x, y, ntree=250, ...)
-    predict.y <-  predict(rfit, new.pcg)
+    predict.y <- predict(rfit, new.pcg)
     return(predict.y)
   }
 
@@ -71,5 +73,30 @@ ICE <- function(train.circ, train.pcg, new.pcg, gene.index, method = "KNN", num 
     svm.fit <- svm(x = x, y = y)
     predict.y <- predict(svm.fit, new.pcg[,mX])
     return(predict.y)
+  }
+
+  if (method == "lasso") {
+    cv.lasso <- cv.glmnet(x, y, alpha = 1, family = 'poisson')
+    # https://stackoverflow.com/a/32185491
+    lasso.model <- glmnet(x, y, alpha = 1, family = 'poisson')
+    predict.y <- predict.glmnet(lasso.model, s = cv.lasso$lambda.min, newx = x)
+    return(predict.y)
+  }
+
+  if (method == "EN") {
+    # http://www.sthda.com/english/articles/37-model-selection-essentials-in-r/153-penalized-regression-essentials-ridge-lasso-elastic-net/
+    en.model <- suppressWarnings(train(
+      x, y, method = 'glmnet',
+      trControl = trainControl("cv", number = 10),
+      tuneLength = 100))
+    predict.y <- predict(en.model, x)
+    return(predict.y)
+  }
+
+  if (method == 'PCR') {
+    # http://www.milanor.net/blog/performing-principal-components-regression-pcr-in-r/
+    temp.df <- data.frame(x, y)
+    pcr.model <- pcr(y ~ ., data = temp.df, scale =TRUE, validation = "CV")
+    predict.y <- predict(pcr.model, x, ...)
   }
 }
