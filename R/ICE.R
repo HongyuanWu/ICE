@@ -7,7 +7,9 @@
 #' @import FNN
 #' @import e1071
 #' @importFrom glmnet cv.glmnet glmnet predict.glmnet
-#' @importFrom caret train predict
+#' @importFrom caret train
+#' @importFrom snowfall sfInit sfGetCluster sfExport sfStop
+#' @importFrom pbapply pblapply
 NULL
 
 #' ICE: Impute expression of a certain series of circRNAs of interest
@@ -44,7 +46,9 @@ ICE <- function(train.circ, train.pcg, new.pcg, gene.index, method = "KNN", num 
   train.pcg <- temp[[1]]
   new.pcg <- temp[[2]]
 
-  train.pcg <- pre_process(train.pcg)
+  if (method != 'lasso' && method != "EN") {
+    train.pcg <- pre_process(train.pcg)
+  }
   train.circ <- filter_circ(train.circ)
 
   if (mode(gene.index) == "numeric") y <- train.circ[, gene.index]
@@ -76,10 +80,10 @@ ICE <- function(train.circ, train.pcg, new.pcg, gene.index, method = "KNN", num 
   }
 
   if (method == "lasso") {
-    cv.lasso <- cv.glmnet(x, y, alpha = 1, family = 'poisson')
+    # cv.lasso <- cv.glmnet(x, y, alpha = 1, family = 'poisson')
     # https://stackoverflow.com/a/32185491
     lasso.model <- glmnet(x, y, alpha = 1, family = 'poisson')
-    predict.y <- predict.glmnet(lasso.model, s = cv.lasso$lambda.min, newx = x)
+    predict.y <- predict.glmnet(lasso.model, newx = x)
     return(predict.y)
   }
 
