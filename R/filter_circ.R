@@ -13,7 +13,7 @@
 #'
 filter_circ <- function (train.circ, cutoff = 75, threshold = 0) {
 
-  if (mode(train.circ)!="numeric" | class(train.circ)!="matrix") stop ("Error: input data must be a numeric matrix")
+  if (mode(train.circ)!="numeric" | !is(train.circ, "matrix")) stop ("Error: input data must be a numeric matrix")
 
   index <- 0
 
