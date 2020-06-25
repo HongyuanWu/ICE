@@ -17,7 +17,7 @@
 #' @examples
 #' Proc.GA.pcg <- pre_process(GA.pcg)
 #'
-pre_process <- function (mat, var.filter = TRUE, log = FALSE, UQ = FALSE, std = TRUE) {
+pre_process <- function (mat, var.filter = TRUE, log = FALSE, UQ = FALSE, std = FALSE) {
   if (mode(mat)!="numeric" | !is(mat, "matrix")) stop ("Error: input data must be a numeric matrix")
 
   if (var.filter == TRUE) {

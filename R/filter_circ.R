@@ -5,7 +5,7 @@
 #'
 #' @param train.circ an expression matrix with circRNA in columns, samples in rows
 #' @param cutoff percentage of samples in which the circRNA should be expressed
-#' @param threshold the numeric threshold defining expression of circRNA. Default threshold = 0.
+#' @param threshold the numeric threshold defining expression of circRNA. Default threshold = 1.
 #' @return filtered circRNA expression matrix
 #'
 #' @examples
@@ -27,5 +27,5 @@ filter_circ <- function (train.circ, cutoff = 75, threshold = 0) {
   index <- index[2:length(index)]
   f_train.circ <- train.circ[, index]
 
-  return (f_train.circ)
+  (scale(f_train.circ))
 }
