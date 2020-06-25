@@ -12,6 +12,7 @@ ICE_cv(
   method = "KNN",
   folds = 10,
   filter = TRUE,
+  cor.method = "spearman",
   ...
 )
 }
@@ -25,7 +26,7 @@ samples, and column names indicating circRNA IDs.}
 \item{gene.index}{either gene name (character) or index (column number) of circRNA to be imputed.}
 
 \item{num}{number of informative protein coding genes to be used in constructing imputation model.
-Default is 50 genes.}
+Default is 100 genes.}
 
 \item{method}{method for imputation, either "RF" for random forests, "KNN" for K-nearest neighbor or
 "SVM" for support vector machines.}
@@ -35,11 +36,15 @@ Default is k=10.}
 
 \item{filter}{if training datasets should be filtered? Default is TRUE, but should be set to FALSE when called in loop.}
 
+\item{cor.method}{a character string indicating
+which correlation coefficient is to be used for the correlation test.
+Default is "spearman", could also be "pearson".}
+
 \item{...}{optional parameters that can be passed on to the machine-learning functions
 RF (\link[randomForest]{randomForest}), KNN (\link[FNN]{knn.reg}) or SVM(\link[e1071]{svm})}
 }
 \value{
-a matrix with three values corresponding to Spearman's correlation coefficient,
+a matrix with three values corresponding to correlation coefficient,
 P-value of the fit and root mean squared error (RMSE).
 }
 \description{
@@ -48,7 +53,7 @@ imputation model
 }
 \examples{
 data(iMIRAGE.datasets)
-ICE_cv(GA.pcg, GA.mir, gene.index="hsa-let-7c", method="KNN", num=50)
-ICE_cv(GA.pcg, GA.mir, gene.index=25, method="KNN", num=50)
+ICE_cv(GA.pcg, GA.mir, gene.index="hsa-let-7c", method="KNN", num=100)
+ICE_cv(GA.pcg, GA.mir, gene.index=25, method="KNN", num=100)
 
 }

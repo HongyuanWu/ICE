@@ -5,7 +5,7 @@
 \alias{ICE}
 \title{ICE: Impute CircRNA Expression}
 \usage{
-ICE(train.circ, train.pcg, new.pcg, gene.index, method = "KNN", num = 50, ...)
+ICE(train.circ, train.pcg, new.pcg, gene.index, method = "KNN", num = 100, ...)
 }
 \arguments{
 \item{train.circ}{training circRNA expression dataset, which should be a numeric matrix with row names indicating
@@ -23,20 +23,15 @@ samples, and column names indicating protein coding gene IDs.}
 "SVM" for support vector machines. Uses KNN by default.}
 
 \item{num}{number of informative protein coding genes to be used in constructing imputation model.
-Default is 50 genes.}
+Default is 100 genes.}
 
 \item{...}{}
 }
 \value{
 
 }
-\description{
-ICE: Impute CircRNA Expression
-
-ICE: Impute expression of a certain series of circRNAs of interest
-}
 \examples{
-data(iMIRAGE.datasets)
-imirage(GA.pcg, GA.mir, HS.pcg, gene_index="hsa-let-7c", method="KNN", num=50)
-imirage(GA.pcg, GA.mir, HS.pcg, gene_index=25, method="KNN", num=50)
+data("mionco.circ")
+data("mionco.pcg")
+pred.circ <- ICE(train.pcg = mionco.pcg, train.circ = mionco.circ, new.pcg = mionco.pcg, gene.index = "hsa_circ_0000801")
 }

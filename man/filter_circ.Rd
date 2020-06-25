@@ -4,14 +4,14 @@
 \alias{filter_circ}
 \title{Pre-standardization filter to select circRNA expressed in a specific proportion of samples}
 \usage{
-filter_circ(train.circ, cutoff = 75, threshold = 0)
+filter_circ(train.circ, cutoff = 95, threshold = 0)
 }
 \arguments{
 \item{train.circ}{an expression matrix with circRNA in columns, samples in rows}
 
 \item{cutoff}{percentage of samples in which the circRNA should be expressed}
 
-\item{threshold}{the numeric threshold defining expression of circRNA. Default threshold = 0.}
+\item{threshold}{the numeric threshold defining expression of circRNA. Default threshold = 1.}
 }
 \value{
 filtered circRNA expression matrix

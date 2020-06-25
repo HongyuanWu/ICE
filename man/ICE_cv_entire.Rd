@@ -2,9 +2,16 @@
 % Please edit documentation in R/ICE_cv_entire.R
 \name{ICE_cv_entire}
 \alias{ICE_cv_entire}
-\title{ICE cross-validation loop function for full circRNA matrix}
+\title{ICE cross-validation for entire circRNA matrix}
 \usage{
-ICE_cv_entire(train.pcg, train.circ, method = "KNN", ...)
+ICE_cv_entire(
+  train.pcg,
+  train.circ,
+  method = "KNN",
+  cor.method = "spearman",
+  ncores = 16,
+  ...
+)
 }
 \arguments{
 \item{train.pcg}{training protein coding dataset. a numeric matrix with with row names indicating
@@ -16,12 +23,16 @@ samples, and column names indicating circRNA IDs.}
 \item{method}{method for imputation, either "RF" for random forests, "KNN" for K-nearest neighbor or
 "SVM" for support vector machines.}
 
+\item{cor.method}{a character string indicating
+which correlation coefficient is to be used for the correlation test.
+Default is "spearman", could also be "pearson".}
+
 \item{...}{optional parameters that can be passed on to the machine-learning method:
 RF (\link[randomForest]{randomForest}), KNN (\link[FNN]{knn.reg}) or SVM(\link[e1071]{svm})}
 }
 \value{
 a matrix containing Spearman's correlation coefficient, P-value and RMSE from the cross-validation analysis
-of the complete miRNA training dataset
+of the complete circRNA training dataset
 }
 \description{
 Convinient wrapper for \link[ICE]{ICE_cv} that performs cross-validation analysis for
